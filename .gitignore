@@ -1,0 +1,41 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model checkpoints and large outputs
+*.pth
+*.pt
+results/
+results_pubchem_and_metrics/
+results_tsne/
+other_parameters/
+figures/
+MD/
+misc/quartile_df
+misc/Pearson_STRIPES_ecfps.ipynb
+logs/
+logs/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
