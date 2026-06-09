@@ -1,0 +1,15 @@
+# Full-pipeline requirements (Python >= 3.8).
+# GPU (CUDA) is optional but strongly recommended for STRIPES2SMILES (torch).
+# Each module also ships its own requirements.txt if you only need a subset.
+
+torch>=2.0.0
+rdkit>=2023.9.5
+scikit-learn>=1.8.0
+optuna>=3.3.0
+numpy>=1.24.0
+pandas>=2.0.3
+matplotlib>=3.7.2
+scipy>=1.15.3
+seaborn>=0.12.2
+tqdm>=4.65.0
+requests>=2.31.0

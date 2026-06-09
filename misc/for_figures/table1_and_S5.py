@@ -28,16 +28,16 @@ for dataset in datasets:
     path = f'{BASE}/{dataset}_finetuned/comparison/generated_beam15_N5_T1.4_step0.5.csv'
     df = pd.read_csv(path)
 
-    # calcola tan_sim tra molecola di riferimento e SMILES generato
+    # compute Tanimoto similarity between reference and generated SMILES
     df['tan_sim'] = [tanimoto(s1, s2) for s1, s2 in zip(df['can_smiles'], df['canonical_smiles'])]
     df.to_csv(path, index=False)
-    print(f"[{dataset}] tan_sim calcolata e CSV aggiornato.")
+    print(f"[{dataset}] tan_sim computed and CSV updated.")
 
     valid = df.dropna(subset=['tan_sim'])
     total = len(df)
     n_valid = len(valid)
     print(f"\n=== Dataset: {dataset} ===")
-    print(f"  Righe totali: {total}  |  Valide (fp OK): {n_valid}")
+    print(f"  Total rows: {total}  |  Valid (fp OK): {n_valid}")
     print(f"  {'Bin':<15} {'N':>6}  {'%':>7}")
     print(f"  {'-'*32}")
 
@@ -78,7 +78,7 @@ for dataset in datasets:
     try:
         df = pd.read_csv(path)
     except FileNotFoundError:
-        print(f"[{dataset}] file non trovato, skip.")
+        print(f"[{dataset}] file not found, skipping.")
         continue
 
     reference_set = set(df['can_smiles'].dropna().unique())
@@ -100,7 +100,7 @@ for dataset in datasets:
     try:
         df = pd.read_csv(path)
     except FileNotFoundError:
-        print(f"[{dataset}] file non trovato, skip.")
+        print(f"[{dataset}] file not found, skipping.")
         continue
 
     print(f"\n=== Dataset: {dataset} — Tanimoto similarity per rank ===")

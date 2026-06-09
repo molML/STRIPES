@@ -1,12 +1,7 @@
 """
-Analisi Descrittori Molecolari - Confronto Distribuzioni
-=========================================================
-Questo script calcola descrittori molecolari completi e confronta le distribuzioni tra:
-  1. Molecole con pKi >= 6 (ATTIVE)
-  2. Molecole con pKi < 6 (INATTIVE)
-  3. Molecole generate (all_unique_molecules.csv)
-
-Visualizzazione: Solo curve di densità (KDE)
+Molecular descriptor KDE distributions — Active vs. Inactive vs. Generated (Supp. Fig. S5).
+Computes 27 physicochemical descriptors per molecule and overlays kernel density estimates
+for active (pKi >= 6), inactive (pKi < 6), and STRIPES-generated compounds, per target.
 """
 
 from pathlib import Path
@@ -124,12 +119,12 @@ def calculate_molecular_descriptors(smiles):
         })
 
     except Exception as e:
-        print(f"Errore nel calcolo dei descrittori: {e}")
+        print(f"Error computing descriptors: {e}")
         return NAN_SERIES.copy()
 
 
 # ==============================================================================
-# PIPELINE PER OGNI TARGET
+# PER-TARGET PIPELINE
 # ==============================================================================
 
 datasets = ['PIM1', 'JAK1', 'AR', 'PPAR']
@@ -140,15 +135,15 @@ for dataset in datasets:
     print(f"DATASET: {dataset}")
     print("=" * 80)
 
-    # --- Caricamento dati ---
+    # --- Load data ---
     df = pd.read_csv(_REPO_ROOT / 'data' / dataset / 'dataset.csv')
-    print(f"✓ Dataset principale: {len(df)} molecole")
+    print(f"✓ Main dataset: {len(df)} molecules")
 
     df_docking = pd.read_csv(
         _REPO_ROOT / 'STRIPES2SMILES' / 'results_finetune'
         / f'{dataset}_finetuned' / 'comparison' / 'all_generated_combined' / 'all_unique_molecules.csv'
     )
-    print(f"✓ Dataset molecole generate: {len(df_docking)} molecole")
+    print(f"✓ Generated molecules dataset: {len(df_docking)} molecules")
 
     smiles_col = None
     for candidate in ('smiles', 'canonical_smiles', 'predicted_smiles'):
@@ -156,38 +151,38 @@ for dataset in datasets:
             smiles_col = candidate
             break
     if smiles_col is None:
-        print(f"⚠️  Nessuna colonna SMILES trovata. Colonne: {list(df_docking.columns)}")
+        print(f"⚠️  No SMILES column found. Columns: {list(df_docking.columns)}")
         smiles_col = df_docking.columns[0]
-    print(f"✓ Colonna SMILES molecole generate: '{smiles_col}'")
+    print(f"✓ SMILES column for generated molecules: '{smiles_col}'")
 
-    # --- Calcolo descrittori ---
-    print("\nCalcolo descrittori dataset principale...")
+    # --- Compute descriptors ---
+    print("\nComputing descriptors for main dataset...")
     descriptors_main = df['smiles'].apply(calculate_molecular_descriptors)
     df_descriptors = pd.concat([df[['smiles', 'pKi']], descriptors_main], axis=1)
     n_invalid = df_descriptors['MW'].isna().sum()
     if n_invalid > 0:
-        print(f"⚠️  Rimosse {n_invalid} molecole con SMILES invalide")
+        print(f"⚠️  Removed {n_invalid} molecules with invalid SMILES")
         df_descriptors = df_descriptors.dropna(subset=['MW'])
 
-    print("\nCalcolo descrittori molecole generate...")
+    print("\nComputing descriptors for generated molecules...")
     descriptors_generated = df_docking[smiles_col].apply(calculate_molecular_descriptors)
     df_generated_descriptors = pd.concat([df_docking[[smiles_col]], descriptors_generated], axis=1)
     n_invalid_gen = df_generated_descriptors['MW'].isna().sum()
     if n_invalid_gen > 0:
-        print(f"⚠️  Rimosse {n_invalid_gen} molecole generate con SMILES invalide")
+        print(f"⚠️  Removed {n_invalid_gen} generated molecules with invalid SMILES")
         df_generated_descriptors = df_generated_descriptors.dropna(subset=['MW'])
 
-    # --- Split attive/inattive ---
+    # --- Split active/inactive ---
     df_active = df_descriptors[df_descriptors['pKi'] >= 6].copy()
     df_inactive = df_descriptors[df_descriptors['pKi'] < 6].copy()
 
-    print(f"\n✓ Attive (pKi >= 6): {len(df_active)}")
-    print(f"✓ Inattive (pKi < 6): {len(df_inactive)}")
-    print(f"✓ Generate: {len(df_generated_descriptors)}")
+    print(f"\n✓ Active (pKi >= 6): {len(df_active)}")
+    print(f"✓ Inactive (pKi < 6): {len(df_inactive)}")
+    print(f"✓ Generated: {len(df_generated_descriptors)}")
 
     all_descriptors = [col for col in df_descriptors.columns if col not in ['smiles', 'pKi']]
 
-    # --- Visualizzazione KDE ---
+    # --- KDE visualization ---
     fixed_descriptors = [
         'HBA', 'TPSA', 'RotatableBonds', 'NumRings',
         'NumHeteroatoms', 'FractionCSP3', 'NumHeavyAtoms', 'SASA'
@@ -265,9 +260,9 @@ for dataset in datasets:
     output_path = _REPO_ROOT / 'figures' / 'descriptors' / f'{dataset}_descriptors_kde_distributions.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"\n✓ Figura salvata: {output_path}")
+    print(f"\n✓ Figure saved: {output_path}")
 
-    # --- Statistiche descrittive ---
+    # --- Descriptive statistics ---
     summary_data = []
     for descriptor in all_descriptors:
         da = df_active[descriptor].dropna()
@@ -286,10 +281,10 @@ for dataset in datasets:
             'Generated_N': len(dg),
         })
     df_summary = pd.DataFrame(summary_data)
-    print("\nStatistiche descrittive (prime 10 righe):")
+    print("\nDescriptive statistics (first 10 rows):")
     print(df_summary.head(10).to_string(index=False))
 
-    # --- Analisi significatività ---
+    # --- Significance analysis ---
     significance_data = []
     for descriptor in all_descriptors:
         da = df_active[descriptor].dropna()
@@ -321,7 +316,7 @@ for dataset in datasets:
     df_significance = pd.DataFrame(significance_data)
     if len(df_significance) > 0:
         df_significance = df_significance.sort_values('p_value_MannWhitney')
-        print("\nTOP 10 DESCRITTORI PIU' DISCRIMINANTI (Active vs Inactive):")
+        print("\nTOP 10 MOST DISCRIMINATING DESCRIPTORS (Active vs Inactive):")
         print("-" * 100)
         header = "{:<6} {:<25} {:<12} {:<12} {:<12} {}".format(
             "Rank", "Descriptor", "p-value", "Cohen's d", "Diff Mean", "Significant"
@@ -334,9 +329,9 @@ for dataset in datasets:
                 row["Cohens_d"], row["Diff_Active_Inactive"], row["Significant"]
             ))
     else:
-        print("⚠️  Nessun dato sufficiente per l'analisi di significatività")
+        print("⚠️  Insufficient data for significance analysis")
 
-    print(f"\nDataset {dataset} completato:")
-    print(f"  - Attive: {len(df_active)}  Inattive: {len(df_inactive)}  Generate: {len(df_generated_descriptors)}")
+    print(f"\nDataset {dataset} done:")
+    print(f"  - Active: {len(df_active)}  Inactive: {len(df_inactive)}  Generated: {len(df_generated_descriptors)}")
     print("=" * 80 + "\n")
 

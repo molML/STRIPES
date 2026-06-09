@@ -7,7 +7,7 @@
 ## Repository structure
 
 ```
-Code_stripes/
+STRIPES/
 ├── STRIPES_similarity/         # Pairwise STRIPES similarity (Hungarian algorithm)
 │   ├── similarity_function_hungarian.py
 │   └── requirements.txt
@@ -19,6 +19,9 @@ Code_stripes/
 │   ├── run_finetuning.py       # entry point — finetuning (Optuna HPO)
 │   ├── generate.py             # entry point — SMILES generation
 │   ├── extract_test_and_generate.py  # batch generation over the finetuning test sets
+│   ├── causal_generation/      # STRIPES sequences for perturbation experiments (Fig. 3e, Supp. Fig. S6)
+│   │   └── PIM1/
+│   │       └── stripes.txt     # PIM1 sequences with manually perturbed interaction tokens
 │   └── requirements.txt
 ├── t-SNE/                      # t-SNE grid search on STRIPES embeddings
 │   ├── tsne_stripes_gridsearch.py
@@ -28,7 +31,6 @@ Code_stripes/
 │   └── requirements.txt
 ├── MD/                         # MD-derived results and STRIPES similarity per dataset
 ├── misc/                       # Analysis / figure-generation scripts used for the paper
-├── slurm/                      # SLURM job scripts for HPC clusters
 ├── figures/                    # Paper figure assets
 └── data/
     ├── MISATO/                 # Pretraining dataset (26 MB)
@@ -44,13 +46,19 @@ Code_stripes/
 
 ## Requirements
 
-Each module has its own `requirements.txt`. Install with:
+Python >= 3.8 is required. GPU support (CUDA) is optional but strongly recommended for `STRIPES2SMILES`.
+
+To install all dependencies at once:
+
+```bash
+pip install -r requirements.txt
+```
+
+Each module also ships its own `requirements.txt` if you only need a specific component:
 
 ```bash
 pip install -r <module>/requirements.txt
 ```
-
-Python >= 3.8 is required. GPU support (CUDA) is optional but strongly recommended for `STRIPES2SMILES`.
 
 ---
 
@@ -67,7 +75,7 @@ Interaction tokens:
 | `B` | Hydrophobic interaction |
 | `S(-)` / `S(+)` | Salt bridge (negative / positive ligand charge) |
 | `X` | Halogen bond |
-| `P(f)` / `P(o)` | π–π stacking (face-to-face / offset) |
+| `P(f)` / `P(o)` / `P(t)` | π–π stacking (face-to-face / offset / T-shaped) |
 | `C(p)` / `C(t)` / `C(e)` | Cation–π interaction (parallel / tilted / edge) |
 | `-` | No interaction |
 
@@ -188,6 +196,23 @@ python misc/merging_generated_mols.py \
 ```
 
 Writes `all_unique_molecules.csv` to `<folder>/all_generated_combined/`.
+
+### 3e — Perturbation experiments (Fig. 3e, Supp. Fig. S6)
+
+To test whether modifying individual interaction tokens in a STRIPES sequence produces chemically coherent changes in the generated molecules, targeted perturbations were applied to representative PIM1 sequences: hydrogen-bond, hydrophobic contact, and salt bridge tokens were independently added or removed. The perturbed sequences are provided in `STRIPES2SMILES/causal_generation/PIM1/stripes.txt` (CSV with columns `mol_id`, `STRIPES`).
+
+Generate SMILES from the perturbed sequences using the standard generation script (see 3d):
+
+```bash
+python STRIPES2SMILES/generate.py \
+    --finetuned_model  results_fine/PIM1_model.pth \
+    --pretrained_model results_pre/pretrained_stripes_encoder.pth \
+    --pretrained_vocab results_pre/stripes_vocab.pkl \
+    --input_csv        STRIPES2SMILES/causal_generation/PIM1/stripes.txt \
+    --output           causal_generation_PIM1.csv
+```
+
+---
 
 ### 3d — Standalone SMILES generation
 

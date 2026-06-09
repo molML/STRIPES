@@ -1,0 +1,3 @@
+canonical_smiles,target,exists_on_pubchem,exists_on_chembl,EC50_uM,IC50_uM,Ki_uM,Kd_uM,AC50_uM,max_tanimoto_full,most_similar_full,max_tanimoto_train,most_similar_train
+CCCCN(c1cccc(-c2ccc(Cl)cc2)c1C)S(=O)(=O)c1ccc(OC(C)C(=O)O)c(C)c1C,PPAR,True,True,0.02512,0.05012,,,,0.9666666666666667,CCCCCN(c1cccc(-c2ccc(Cl)cc2)c1C)S(=O)(=O)c1ccc(OC(C)C(=O)O)c(C)c1C,0.9666666666666667,CCCCCN(c1cccc(-c2ccc(Cl)cc2)c1C)S(=O)(=O)c1ccc(OC(C)C(=O)O)c(C)c1C
+CCC(Cc1ccc(OC)c(CNC(=O)c2ccc(C(F)(F)F)cc2)c1)C(=O)O,PPAR,True,True,0.12,,,,,0.8545454545454545,CCCC(Cc1ccc(OC)c(CNC(=O)c2ccc(C(F)(F)F)cc2)c1)C(=O)O,0.8545454545454545,CCCC(Cc1ccc(OC)c(CNC(=O)c2ccc(C(F)(F)F)cc2)c1)C(=O)O

@@ -1,0 +1,4 @@
+canonical_smiles,target,exists_on_pubchem,exists_on_chembl,EC50_uM,IC50_uM,Ki_uM,Kd_uM,AC50_uM,max_tanimoto_full,most_similar_full,max_tanimoto_train,most_similar_train
+Cn1cc(NC(=O)c2cnn3cccnc23)c(-c2cc(Cl)ccc2OC(F)F)n1,JAK1,True,True,,0.0017,0.0002099999999999,,,0.7733333333333333,CN[C@@H](C)Cn1cc(NC(=O)c2cnn3cccnc23)c(-c2cc(Cl)ccc2OC(F)F)n1,0.7733333333333333,CN[C@@H](C)Cn1cc(NC(=O)c2cnn3cccnc23)c(-c2cc(Cl)ccc2OC(F)F)n1
+COc1ccc(Cl)cc1-c1nn(C)cc1NC(=O)c1cnn2cccnc12,JAK1,True,True,,0.025,0.00057,,,0.8064516129032258,Cn1cc(NC(=O)c2cnn3cccnc23)c(-c2cc(Cl)ccc2Cl)n1,0.8064516129032258,Cn1cc(NC(=O)c2cnn3cccnc23)c(-c2cc(Cl)ccc2Cl)n1
+O=C(Nc1cn(CC(=O)N2CCC(N3CCOCC3)CC2)nc1-c1cc(Cl)ccc1OC(F)F)c1cnn2cccnc12,JAK1,True,True,,,0.00038,,,0.9540229885057471,O=C(Nc1cn(CC(=O)N2CCC(N3CCCOCC3)CC2)nc1-c1cc(Cl)ccc1OC(F)F)c1cnn2cccnc12,0.9540229885057471,O=C(Nc1cn(CC(=O)N2CCC(N3CCCOCC3)CC2)nc1-c1cc(Cl)ccc1OC(F)F)c1cnn2cccnc12

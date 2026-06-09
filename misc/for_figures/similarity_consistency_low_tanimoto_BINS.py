@@ -24,15 +24,15 @@ mpl.rcParams['font.sans-serif'] = ['Arial']
 datasets = ['JAK1', 'PIM1', 'AR', 'PPAR']
 
 #%% ============================================================
-# CARICA E PREPARA I DATI PER OGNI DATASET
+# LOAD AND PREPARE DATA FOR EACH DATASET
 # ============================================================
 
 all_data = {}
 
 for dataset in datasets:
-    print(f"Caricamento dati per {dataset}...")
+    print(f"Loading data for {dataset}...")
 
-    # Carica dati
+    # Load data
     df = pd.read_csv(_REPO_ROOT / 'data' / dataset / 'dataset.csv')
     smiles_list = df['smiles'].tolist()
     mols = [Chem.MolFromSmiles(smiles) for smiles in smiles_list]
@@ -45,7 +45,7 @@ for dataset in datasets:
         similarities = rdkit.DataStructs.BulkTanimotoSimilarity(fp, fps)
         tanimoto_matrix.append(similarities)
 
-    # Crea dataframe coppie uniche
+    # Build unique-pair dataframe
     data = []
     for i, sim_row in enumerate(tanimoto_matrix):
         for j, similarity in enumerate(sim_row):
@@ -60,7 +60,7 @@ for dataset in datasets:
 
     tanimoto_df = pd.DataFrame(data)
 
-    # Carica STRIPES
+    # Load STRIPES
     df_stripes = pd.read_csv(_REPO_ROOT / 'STRIPES_similarity' / 'results' / dataset / 'results.csv')
     df_stripes = df_stripes[~df_stripes.isin(['ERROR']).any(axis=1)]
     df_stripes = df_stripes[df_stripes['smiles1'] != df_stripes['smiles2']]
@@ -84,7 +84,7 @@ for dataset in datasets:
 
     all_data[dataset] = tanimoto_df
 
-print("Dati caricati per tutti i dataset.\n")
+print("Data loaded for all datasets.\n")
 
 #%% ============================================================
 # 2D HEATMAP 1: STRIPES vs Tanimoto with median ΔpKi ONLY (no n)

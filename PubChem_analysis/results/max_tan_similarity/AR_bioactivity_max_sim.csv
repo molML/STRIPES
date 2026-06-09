@@ -1,0 +1,6 @@
+canonical_smiles,target,exists_on_pubchem,exists_on_chembl,EC50_uM,IC50_uM,Ki_uM,Kd_uM,AC50_uM,max_tanimoto_full,most_similar_full,max_tanimoto_train,most_similar_train
+CCC1CCN(C)c2cc3[nH]c(=O)cc(C(F)(F)F)c3cc21,AR,True,False,0.158,10.0,0.63,,,0.660377358490566,CCC1CCN(C)c2cc3c(cc21)c(C(F)(F)F)cc(=O)n3C,0.660377358490566,CCC1CCN(C)c2cc3c(cc21)c(C(F)(F)F)cc(=O)n3C
+O=c1cc(C(F)(F)F)c2cc3c(cc2[nH]1)OCCN3,AR,True,True,10.0,0.296,1.0,,,0.6122448979591837,CC1COc2cc3[nH]c(=O)cc(C(F)(F)F)c3cc2N1,0.5918367346938775,CN1CCOc2cc3[nH]c(=O)cc(C(F)(F)F)c3cc21
+Cc1c(N2C(=O)[C@@H]3[C@H](O)CCN3S2(=O)=O)ccc(C#N)c1Cl,AR,False,True,,,0.00045,,,0.6491228070175439,Cc1c(N2C(=O)[C@@H]3C[C@H](O)CN3S2(=O)=O)ccc(C#N)c1Cl,0.6491228070175439,Cc1c(N2C(=O)[C@@H]3C[C@H](O)CN3S2(=O)=O)ccc(C#N)c1Cl
+C[C@](O)(CN1CCc2cc(Br)ccc21)C(=O)Nc1ccc(C#N)c(C(F)(F)F)c1,AR,False,True,,0.531,0.198,,,0.8064516129032258,C[C@](O)(CN1CCc2cc(F)c(F)cc21)C(=O)Nc1ccc(C#N)c(C(F)(F)F)c1,0.8064516129032258,C[C@](O)(CN1CCc2cc(F)c(F)cc21)C(=O)Nc1ccc(C#N)c(C(F)(F)F)c1
+CCCNc1ccc2[nH]c(=O)cc(C(F)(F)F)c2c1,AR,True,False,2.022,0.0275,0.054,,,0.8048780487804879,CCCNc1ccc2c(C(F)(F)F)cc(=O)[nH]c2c1,0.8048780487804879,CCCNc1ccc2c(C(F)(F)F)cc(=O)[nH]c2c1

@@ -1,9 +1,9 @@
 """
-Plot combinato:
-  - Internal STRIPES similarity (distribuzione interna per dataset)
-  - Two-stripes similarity (coppie di input che generano lo stesso output)
-I due tipi sono distinti per colore unico; le coppie dello stesso dataset
-sono affiancate, alternando internal → two-stripes.
+Combined violin/box plot (Fig. 3b):
+  - Internal STRIPES similarity (per-dataset baseline)
+  - Two-stripes / convergent-input similarity (pairs that generate the same output)
+  - MD-derived de novo design similarity
+Distributions within each dataset are shown side by side.
 """
 from pathlib import Path
 
@@ -38,15 +38,15 @@ similarity_MD = {
     'PPAR': _ppar_sim['stripes_sim'].dropna().tolist(),
 }
 
-COLOR_INTERNAL   = '#5B8DB8'   # blu  – interno
-COLOR_TWOSTRIPES = '#C96A4E'   # arancio – same predicted output
-COLOR_MD         = '#5A9B6A'   # verde – MD similarity
+COLOR_INTERNAL   = '#5B8DB8'   # blue   – internal
+COLOR_TWOSTRIPES = '#C96A4E'   # orange – convergent inputs
+COLOR_MD         = '#5A9B6A'   # green  – MD similarity
 
 TOKEN_DICT_PATH = _REPO_ROOT / 'data' / 'stripes_tokens2label.json'
 BASE_PATH       = _REPO_ROOT / 'STRIPES_similarity' / 'results'
 
 
-# ── Funzioni di similarità ────────────────────────────────────────────────────
+# ── Similarity functions ──────────────────────────────────────────────────────
 def parse_stripe(stripes_str: str) -> List[List[str]]:
     if not stripes_str or stripes_str.strip() == '':
         return []
@@ -59,7 +59,7 @@ def parse_stripe(stripes_str: str) -> List[List[str]]:
                 parsed_atoms.append(tokens)
         return parsed_atoms
     except Exception as e:
-        print(f"Errore nel parsing: {e}")
+        print(f"Error parsing STRIPES string: {e}")
         return []
 
 
@@ -118,9 +118,9 @@ def calculate_similarity(stripes1: str, stripes2: str, token_to_index: dict) -> 
     return hungarian_similarity(vecs1, vecs2)
 
 
-# ── Carica dizionario token ───────────────────────────────────────────────────
+# ── Load token dictionary ─────────────────────────────────────────────────────
 token_to_index = load_token_dictionary(TOKEN_DICT_PATH)
-print(f"Dizionario caricato: {len(token_to_index)} token")
+print(f"Token dictionary loaded: {len(token_to_index)} entries")
 
 
 # ── 1) Distribuzione interna ──────────────────────────────────────────────────
@@ -133,7 +133,7 @@ for dataset in datasets:
     df = df[(df['pKi1'] >= 6) & (df['pKi2'] >= 6)]
     df = df[df['smiles1'] != df['smiles2']]
     dfs_internal[dataset] = df['similarity'].dropna().values
-    print(f"[{dataset}] internal: {len(dfs_internal[dataset])} coppie  |  "
+    print(f"[{dataset}] internal: {len(dfs_internal[dataset])} pairs  |  "
           f"median={np.median(dfs_internal[dataset]):.3f}  "
           f"mean={np.mean(dfs_internal[dataset]):.3f}")
 
@@ -157,7 +157,7 @@ for dataset in datasets:
         row['canonical_smiles']: list(set(row['can_smiles']))
         for _, row in df_multi_input.iterrows()
     }
-    print(f"\n[{dataset}] SMILES generate da più input: {len(predicted_to_inputs)}")
+    print(f"\n[{dataset}] SMILES generated from multiple inputs: {len(predicted_to_inputs)}")
 
     df_stripes = pd.read_csv(_REPO_ROOT / 'data' / dataset / 'dataset.csv')
     smiles_to_stripes = dict(zip(df_stripes['can_smiles'], df_stripes['STRIPES']))
@@ -172,7 +172,7 @@ for dataset in datasets:
         if len(inputs_with_stripes) > 1:
             predicted_to_inputs_with_stripes[pred] = inputs_with_stripes
 
-    print(f"[{dataset}] Gruppi con STRIPES: {len(predicted_to_inputs_with_stripes)}")
+    print(f"[{dataset}] Groups with STRIPES: {len(predicted_to_inputs_with_stripes)}")
 
     results = []
     for pred_smiles, inputs in predicted_to_inputs_with_stripes.items():
@@ -188,7 +188,7 @@ for dataset in datasets:
     df_results = pd.DataFrame(results)
     df_results = df_results[df_results['predicted_smiles'] != 'INVALID']
     df_results['dataset'] = dataset
-    print(f"[{dataset}] two-stripes: {len(df_results)} coppie")
+    print(f"[{dataset}] two-stripes: {len(df_results)} pairs")
     all_similarity_results.append(df_results)
 
 df_all_stripes = pd.concat(all_similarity_results, ignore_index=True)
@@ -221,14 +221,14 @@ for dataset in datasets:
     print(f"[{dataset}] Mann-Whitney (int vs MD)         U={stat:.0f}  p={p:.4g}  {pval_to_stars(p)}")
 
 
-# ── 3) Plot combinato ─────────────────────────────────────────────────────────
+# ── 3) Combined plot ──────────────────────────────────────────────────────────
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'Helvetica', 'DejaVu Sans']
-PAIR_OFFSET    = 0.60   # distanza intra-coppia
-GROUP_SPACING  = 2.40   # distanza tra gruppi (aumentato per 3 violini)
+PAIR_OFFSET    = 0.60   # within-group spacing
+GROUP_SPACING  = 2.40   # spacing between groups
 VIOLIN_WIDTH   = 0.45
 BOX_WIDTH      = 0.14
-MAX_JITTER_PTS = 500    # campione massimo per i puntini jitter
+MAX_JITTER_PTS = 500    # max jitter sample size
 
 rng = np.random.default_rng(42)
 
@@ -268,12 +268,12 @@ for i, dataset in enumerate(datasets):
         else:
             ax.scatter([pos], data, color=color, alpha=0.85, s=80, zorder=5, marker='D')
 
-        # Jitter (campionato per dataset grandi)
+        # Jitter (subsampled for large datasets)
         sample = data if len(data) <= MAX_JITTER_PTS else rng.choice(data, MAX_JITTER_PTS, replace=False)
         jitter = rng.uniform(-0.09, 0.09, size=len(sample))
         ax.scatter(pos + jitter, sample, color=color, alpha=0.30, s=10, zorder=3, linewidths=0)
 
-    # Significatività Mann-Whitney (internal vs Convergent inputs)
+    # Mann-Whitney significance (internal vs Convergent inputs)
     data_int = dfs_internal[dataset]
     data_str = df_all_stripes[df_all_stripes['dataset'] == dataset]['similarity'].values
     y_top = 1.02
@@ -283,18 +283,18 @@ for i, dataset in enumerate(datasets):
             [y_top, y_top + h, y_top + h, y_top],
             lw=1.0, color='black')
 
-    # Significatività Mann-Whitney (internal vs MD)
+    # Mann-Whitney significance (internal vs MD)
     y_top_md = 1.07
     ax.plot([pos_int, pos_int, pos_md, pos_md],
             [y_top_md, y_top_md + h, y_top_md + h, y_top_md],
             lw=1.0, color='black')
 
-# Linee verticali di separazione tra le coppie
+# Vertical separators between dataset groups
 for i in range(1, len(datasets)):
     sep = i * GROUP_SPACING - (GROUP_SPACING - 2 * PAIR_OFFSET) / 2
     ax.axvline(sep, color='grey', linewidth=0.6, linestyle='--', alpha=0.4)
 
-# Legenda
+# Legend
 legend_elements = [
     Patch(facecolor=COLOR_INTERNAL,   alpha=0.85, label='Internal distribution'),
     Patch(facecolor=COLOR_TWOSTRIPES, alpha=0.85, label='Convergent inputs'),

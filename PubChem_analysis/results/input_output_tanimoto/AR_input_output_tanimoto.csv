@@ -1,0 +1,6 @@
+dataset,input_can_smiles,output_canonical_smiles,tanimoto_input_output,exists_on_pubchem,exists_on_chembl,EC50_uM,IC50_uM,Ki_uM,Kd_uM,AC50_uM
+AR,CC(C)Nc1ccc2nc(O)cc(C(F)(F)F)c2c1,CCCNc1ccc2[nH]c(=O)cc(C(F)(F)F)c2c1,0.30357142857142855,True,False,2.022,0.0275,0.054,,
+AR,C[C@H]1CNc2cc3nc(O)cc(C(F)(F)F)c3cc2C1CCC(F)(F)F,CCC1CCN(C)c2cc3[nH]c(=O)cc(C(F)(F)F)c3cc21,0.24,True,False,0.158,10.0,0.63,,
+AR,C[C@](O)(Cn1ccc2cc(I)ccc21)C(=O)Nc1ccc(C#N)c(C(F)(F)F)c1,C[C@](O)(CN1CCc2cc(Br)ccc21)C(=O)Nc1ccc(C#N)c(C(F)(F)F)c1,0.527027027027027,False,True,,0.531,0.198,,
+AR,Cc1c(/N=C2\N(C(N)=O)C[C@@H]3[C@H](O)CCN23)ccc(C#N)c1Cl,Cc1c(N2C(=O)[C@@H]3[C@H](O)CCN3S2(=O)=O)ccc(C#N)c1Cl,0.39436619718309857,False,True,,,0.00045,,
+AR,Oc1cc(C(F)(F)F)c2cc3c(cc2n1)NCC3,O=c1cc(C(F)(F)F)c2cc3c(cc2[nH]1)OCCN3,0.2982456140350877,True,True,10.0,0.296,1.0,,
