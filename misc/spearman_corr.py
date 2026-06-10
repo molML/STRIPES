@@ -9,14 +9,14 @@ CSV_PATH = _REPO_ROOT / "t-SNE" / "results_tsne" / "best_configuration_results.c
 OUT_PATH = _REPO_ROOT / "figures" / "spearman_correlation_heatmap.png"
 
 PROPERTIES = [
-    "lig_MW",
+    "mean_hydropathy",
     "lig_logP",
     "lig_TPSA",
     "count_h_bonds",
 ]
 
 LABELS = {
-    "lig_MW": "Molecular Weight",
+    "mean_hydropathy": "Mean Hydropathy",
     "lig_logP": "logP",
     "lig_TPSA": "TPSA",
     "count_h_bonds": "H-bond Count",
