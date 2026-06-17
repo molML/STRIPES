@@ -302,6 +302,28 @@ data/<DATASET>/dataset.csv    # must contain column 'can_smiles' (used as the no
 
 All random seeds are fixed to 42. Results may vary slightly across hardware and software versions due to non-deterministic GPU operations.
 
+## How to cite
+
+If you use this repository in your work, please cite:
+
+> Criscuolo, E., & Grisoni, F. (2026). *Towards a physically interpretable symbolic language of molecular recognition.* ChemRxiv. https://doi.org/10.26434/chemrxiv.15000358
+
+<details>
+<summary>BibTeX</summary>
+
+```bibtex
+@article{criscuolo2026towards,
+  title   = {Towards a physically interpretable symbolic language of molecular recognition},
+  author  = {Criscuolo, Emanuele and Grisoni, Francesca},
+  year    = {2026},
+  journal = {ChemRxiv},
+  doi     = {10.26434/chemrxiv.15000358},
+  note    = {Preprint},
+  url     = {https://doi.org/10.26434/chemrxiv.15000358}
+}
+```
+</details>
+
 ---
 
 ## License
