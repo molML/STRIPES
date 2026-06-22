@@ -1,5 +1,7 @@
 # STRIPES
 
+<img src="stripes_logo.png" width="400">
+
 **STRIPES** (Spatio-Temporal Representation of Interactions in Protein-ligand Engagement Strings) encodes per-atom protein–ligand interactions from MD trajectories into symbolic strings amenable to data analysis and deep learning. This repository contains the full pipeline: extraction from simulations, pairwise similarity computation, SMILES generation via a pretrained Transformer, and embedding visualization with t-SNE.
 
 ---
