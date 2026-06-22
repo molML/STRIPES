@@ -1,4 +1,4 @@
-# STRIPES
+# Spatio-Temporal Representation of Interactions in Protein-ligand Engagement Strings (STRIPES)
 
 <img src="stripes_logo.png" width="600">
 
