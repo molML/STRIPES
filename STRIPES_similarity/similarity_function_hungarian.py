@@ -41,8 +41,21 @@ def build_token_index_from_file(file_path):
 
 
 def atom_to_index_vector(atom_tokens, token_to_index):
-    """Convert the tokens of an atom into a list of indices."""
-    return [token_to_index[token] for token in atom_tokens if token in token_to_index]
+    """Convert the tokens of an atom into a list of indices.
+
+    Tokens missing from the dictionary are appended to it with a fresh index
+    rather than discarded: dropping them would silently inflate the similarity
+    (an unmatched token can no longer count as a mismatch). Existing indices are
+    never renumbered, so an extended dictionary stays compatible with the one it
+    came from. Only token identity matters for the Jaccard score below, so the
+    index values themselves are arbitrary.
+    """
+    vector = []
+    for token in atom_tokens:
+        if token not in token_to_index:
+            token_to_index[token] = len(token_to_index)
+        vector.append(token_to_index[token])
+    return vector
 
 
 def precompute_atom_vectors(parsed_stripe, token_to_index):

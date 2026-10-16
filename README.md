@@ -87,13 +87,19 @@ Example: `H(a1).H(a1).B;-.-.−;...`
 
 ## 0 — Token vocabulary
 
-The pairwise-similarity (section 2), pretraining (section 3a), and t-SNE (section 4) steps all require a STRIPES token-to-index mapping at `data/stripes_tokens2label.json`. Generate it once from the MISATO dataset:
+The pairwise-similarity (section 2) and t-SNE (section 4) steps use a STRIPES token-to-index mapping at `data/stripes_tokens2label.json`. Generate it once from the MISATO dataset:
 
 ```bash
 python misc/stripes_token2label.py
 ```
 
 Reads `data/MISATO/dataset.csv` (column `STRIPES`) and writes `data/stripes_tokens2label.json`.
+
+> **This is not the model vocabulary.** Pretraining (section 3a) builds its own STRIPES vocabulary from the training sequences and saves it as `stripes_vocab.pkl`; finetuning and generation take that file via `--pretrained_vocab`. The two are independent — editing or regenerating the JSON has no effect on the model.
+
+Because the mapping is built from MISATO, it does not list every token the target datasets contain: those are richer in *composite* tokens (several interactions on one atom, e.g. `[C(e)H(a2)P(o)]`), between 26 and 95 of which are absent per dataset. The similarity scripts therefore assign a fresh index to any token they have not seen, instead of discarding it — discarding would silently inflate the score, since a dropped token can no longer count as a mismatch. Existing indices are never renumbered, so the extended mapping stays compatible with the file on disk; pass `--save-token-index` to `MD/similarity_function_hungarian.py` to keep it.
+
+The t-SNE step cannot extend the mapping this way, since `len(vocabulary)` fixes its embedding dimension. On MISATO (the dataset used in the paper) the mapping is complete by construction, so this is not an issue; running t-SNE on a target dataset instead would need a mapping rebuilt beforehand from all the corpora involved.
 
 ---
 

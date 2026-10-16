@@ -69,7 +69,18 @@ def load_token_dictionary(file_path: str) -> dict:
 
 
 def atom_to_index_vector(atom_tokens: List[str], token_to_index: dict) -> List[int]:
-    return [token_to_index[token] for token in atom_tokens if token in token_to_index]
+    # Tokens missing from the dictionary are appended with a fresh index rather
+    # than discarded: dropping them would silently inflate the similarity, since
+    # an unmatched token can no longer count as a mismatch. The dictionary is
+    # built from MISATO, while the target datasets contain composite tokens it
+    # does not list. Existing indices are never renumbered, and only token
+    # identity matters for the Jaccard score, so the index values are arbitrary.
+    vector = []
+    for token in atom_tokens:
+        if token not in token_to_index:
+            token_to_index[token] = len(token_to_index)
+        vector.append(token_to_index[token])
+    return vector
 
 
 def precompute_atom_vectors(parsed_stripe: List[List[str]], token_to_index: dict) -> List[List[int]]:

@@ -42,8 +42,21 @@ def build_token_index_from_file(file_path):
 
 
 def atom_to_index_vector(atom_tokens, token_to_index):
-    """Convert the tokens of an atom into a list of indices."""
-    return [token_to_index[token] for token in atom_tokens if token in token_to_index]
+    """Convert the tokens of an atom into a list of indices.
+
+    Tokens missing from the dictionary are appended to it with a fresh index
+    rather than discarded: dropping them would silently inflate the similarity
+    (an unmatched token can no longer count as a mismatch). Existing indices are
+    never renumbered, so an extended dictionary stays compatible with the one it
+    came from. Only token identity matters for the Jaccard score below, so the
+    index values themselves are arbitrary.
+    """
+    vector = []
+    for token in atom_tokens:
+        if token not in token_to_index:
+            token_to_index[token] = len(token_to_index)
+        vector.append(token_to_index[token])
+    return vector
 
 
 def precompute_atom_vectors(parsed_stripe, token_to_index):
@@ -116,8 +129,13 @@ if __name__ == "__main__":
     )
     parser.add_argument('--dataset', required=True,
                         help="Path to the input CSV file with 'stripes' and 'gen stripes' columns.")
-    parser.add_argument('--token-index', required=True,
-                        help="Path to the token-to-index JSON file.")
+    parser.add_argument('--token-index', default=None,
+                        help="Path to the token-to-index JSON file. Optional: the "
+                             "score only depends on token identity, so an empty "
+                             "dictionary built from the data gives the same result.")
+    parser.add_argument('--save-token-index', default=None,
+                        help="Write the dictionary back out, extended with any token "
+                             "found in the data but missing from --token-index.")
     parser.add_argument('--output', required=True,
                         help="Path to the output CSV file.")
     parser.add_argument('--col-stripes', default='stripes',
@@ -128,9 +146,14 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    print("Loading token dictionary...")
-    token_to_index = build_token_index_from_file(args.token_index)
-    print(f"Tokens in dictionary: {len(token_to_index)}")
+    if args.token_index:
+        print("Loading token dictionary...")
+        token_to_index = build_token_index_from_file(args.token_index)
+    else:
+        print("No token dictionary given, building one from the data...")
+        token_to_index = {}
+    n_tokens_loaded = len(token_to_index)
+    print(f"Tokens in dictionary: {n_tokens_loaded}")
 
     print("Loading dataset...")
     df = pd.read_csv(args.dataset)
@@ -167,6 +190,21 @@ if __name__ == "__main__":
     df.to_csv(args.output, index=False)
     print(f"\nOutput saved: {args.output}")
     print(f"Valid pairs: {len(df) - invalid_count}, Invalid (NaN): {invalid_count}")
+
+    new_tokens = sorted(list(token_to_index)[n_tokens_loaded:])
+    if new_tokens:
+        print(f"\nTokens found in the data but missing from the dictionary: "
+              f"{len(new_tokens)} (dictionary now holds {len(token_to_index)})")
+        for token in new_tokens:
+            print(f"  {token}")
+        if not args.save_token_index:
+            print("Pass --save-token-index to store the extended dictionary.")
+
+    if args.save_token_index:
+        with open(args.save_token_index, 'w') as f:
+            json.dump(token_to_index, f, indent=1)
+        print(f"Token dictionary saved: {args.save_token_index} "
+              f"({len(token_to_index)} tokens)")
 
     valid_sims = [s for s in similarities if not pd.isna(s)]
     if valid_sims:
