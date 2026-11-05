@@ -345,17 +345,24 @@ All random seeds are fixed to 42. Results may vary slightly across hardware and 
 
 ### Externally archived artifacts
 
-This repository holds the code and the compact result tables the figures are built from. The bulk outputs are archived separately, since they run to several gigabytes:
+This repository holds the code and the compact result tables the figures are built from. The bulk outputs are archived on Zenodo, since they run to several gigabytes:
 
-| Artifact | Size | Produced by |
-|---|---|---|
-| All-vs-all similarity results per dataset | 5.2 GB | section 2 |
-| Finetuning results, generation sweeps, `*_model.pth` | 485 MB | sections 3b–3c |
-| Pretraining results, `pretrained_stripes_encoder.pth` | 105 MB | section 3a |
-| t-SNE grid-search outputs (36 configurations) | 173 MB | section 4 |
-| Docking poses, maps and AutoDock logs | 156 MB | section 3f |
+<!-- TODO: insert the Zenodo DOI here once the record is published -->
+**Zenodo:** `<DOI>`
 
-The vocabularies the released checkpoints were trained with are small enough to ship here, in `STRIPES2SMILES/vocab/` — a checkpoint cannot be loaded without the matching one.
+| Archive | Download | Contents | Produced by |
+|---|---|---|---|
+| `07_checkpoints.tar.gz` | 839 MB | pretrained encoder, the four finetuned decoders, both vocabularies | §3a–3b |
+| `01_similarity_results.tar.gz` | 356 MB | all-vs-all similarity per dataset (5.2 GB uncompressed) | §2 |
+| `04_tsne_gridsearch.tar.gz` | 113 MB | grid-search outputs, 36 configurations | §4 |
+| `05_docking.tar.gz` | 36 MB | docking poses, maps and AutoDock logs | §3f |
+| `03_finetuning.tar.gz` | 14 MB | Optuna searches, splits, metrics, generation sweeps | §3b–3c |
+| `06_notebooks.tar.gz` | 2.4 MB | STRIPES/ECFP correlation notebook | — |
+| `02_pretraining.tar.gz` | 148 KB | pretraining loss curves and metadata | §3a |
+
+`MANIFEST.md` and `SHA256SUMS` sit beside the archives, so the record can be read and checked without downloading anything.
+
+Model weights are grouped into one archive rather than filed with the results they came from: they are the only incompressible part of the record, and generation needs the encoder together with a finetuned decoder. Everything else is small enough to download whole. Both vocabularies are also shipped here, in `STRIPES2SMILES/vocab/` — a checkpoint cannot be loaded without the matching one.
 
 ## How to cite
 
