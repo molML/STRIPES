@@ -24,6 +24,9 @@ STRIPES/
 │   ├── causal_generation/      # STRIPES sequences for perturbation experiments (Fig. 3e, Supp. Fig. S6)
 │   │   └── PIM1/
 │   │       └── stripes.txt     # PIM1 sequences with manually perturbed interaction tokens
+│   ├── vocab/                  # vocabularies the released checkpoints were trained with
+│   │   ├── stripes_vocab.pkl   # encoder input vocabulary (--pretrained_vocab)
+│   │   └── smiles_vocab.pkl    # decoder output vocabulary
 │   └── requirements.txt
 ├── t-SNE/                      # t-SNE grid search on STRIPES embeddings
 │   ├── tsne_stripes_gridsearch.py
@@ -32,6 +35,10 @@ STRIPES/
 │   ├── pubchem_search.py
 │   └── requirements.txt
 ├── MD/                         # MD-derived results and STRIPES similarity per dataset
+│   ├── similarity_function_hungarian.py  # adds the 'stripes_sim' column
+│   ├── build_results.py        # joins the docking table with the MD-extracted STRIPES
+│   ├── docking/<TARGET>/       # docking inputs: ligand table, box (conf.txt), receptor
+│   └── <TARGET>/results_sim.csv
 ├── misc/                       # Analysis / figure-generation scripts used for the paper
 ├── figures/                    # Paper figure assets
 └── data/
@@ -248,6 +255,32 @@ Outputs `<output>.csv` (columns `mol_id`, `can_smiles`, `stripes`, `rank`, `smil
 
 ---
 
+## 3f — MD-derived STRIPES similarity
+
+The generated molecules selected above are docked, simulated, and their STRIPES re-extracted from the resulting trajectories (same companion tool as section 1). This step compares those *realised* interaction patterns against the STRIPES the molecule was generated from — i.e. it asks whether a molecule designed for a given interaction profile actually reproduces it.
+
+`MD/docking/<TARGET>/` holds what defines the docking run: the ligand table (`<TARGET>_filtered_for_docking.csv`, with the `ligand_idx` the MD runs are keyed by), the search box (`conf.txt`), and the prepared receptor (`.pdbqt`). The poses, maps and AutoDock logs are archived externally (see *Reproducibility*).
+
+Join the docking table with the MD-extracted STRIPES, then score each pair:
+
+```bash
+python MD/build_results.py \
+    --docking    MD/docking/PIM1/PIM1_filtered_for_docking.csv \
+    --md-stripes <md_run>/STRIPES/pim1_generated.csv \
+    --output     MD/PIM1/results.csv
+
+python MD/similarity_function_hungarian.py \
+    --dataset     MD/PIM1/results.csv \
+    --token-index data/stripes_tokens2label.json \
+    --output      MD/PIM1/results_sim.csv
+```
+
+**MD input CSV** must contain columns `ligand_id` and `STRIPES`; `ligand_id` matches `ligand_idx` in the docking table. The join is an inner one, so ligands whose simulation produced no stripe are dropped and reported.
+
+**Output:** `MD/<TARGET>/results_sim.csv` — the docking table plus `gen stripes` (realised) and `stripes_sim` (Hungarian similarity against the reference `stripes`). Consumed by `misc/for_figures/stripes_similarity_distribution.py` (Fig. 3b) and `misc/for_figures/table1_and_S5.py` (Table 1, Supp. Table S5).
+
+---
+
 ## 4 — t-SNE visualization
 
 Grid search over 36 combinations of t-SNE hyperparameters (perplexity, n_iter, learning_rate) evaluated by trustworthiness and continuity.
@@ -309,6 +342,20 @@ data/<DATASET>/dataset.csv    # must contain column 'can_smiles' (used as the no
 ## Reproducibility
 
 All random seeds are fixed to 42. Results may vary slightly across hardware and software versions due to non-deterministic GPU operations.
+
+### Externally archived artifacts
+
+This repository holds the code and the compact result tables the figures are built from. The bulk outputs are archived separately, since they run to several gigabytes:
+
+| Artifact | Size | Produced by |
+|---|---|---|
+| All-vs-all similarity results per dataset | 5.2 GB | section 2 |
+| Finetuning results, generation sweeps, `*_model.pth` | 485 MB | sections 3b–3c |
+| Pretraining results, `pretrained_stripes_encoder.pth` | 105 MB | section 3a |
+| t-SNE grid-search outputs (36 configurations) | 173 MB | section 4 |
+| Docking poses, maps and AutoDock logs | 156 MB | section 3f |
+
+The vocabularies the released checkpoints were trained with are small enough to ship here, in `STRIPES2SMILES/vocab/` — a checkpoint cannot be loaded without the matching one.
 
 ## How to cite
 
