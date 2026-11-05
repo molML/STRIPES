@@ -352,13 +352,13 @@ This repository holds the code and the compact result tables the figures are bui
 
 | Archive | Download | Contents | Produced by |
 |---|---|---|---|
-| `07_checkpoints.tar.gz` | 839 MB | pretrained encoder, the four finetuned decoders, both vocabularies | §3a–3b |
-| `01_similarity_results.tar.gz` | 356 MB | all-vs-all similarity per dataset (5.2 GB uncompressed) | §2 |
-| `04_tsne_gridsearch.tar.gz` | 113 MB | grid-search outputs, 36 configurations | §4 |
-| `05_docking.tar.gz` | 36 MB | docking poses, maps and AutoDock logs | §3f |
-| `03_finetuning.tar.gz` | 14 MB | Optuna searches, splits, metrics, generation sweeps | §3b–3c |
+| `07_checkpoints.tar.gz` | 839 MB | pretrained encoder, the four finetuned decoders, both vocabularies | sections 3a–3b |
+| `01_similarity_results.tar.gz` | 356 MB | all-vs-all similarity per dataset (5.2 GB uncompressed) | section 2 |
+| `04_tsne_gridsearch.tar.gz` | 113 MB | grid-search outputs, 36 configurations | section 4 |
+| `05_docking.tar.gz` | 36 MB | docking poses, maps and AutoDock logs | section 3f |
+| `03_finetuning.tar.gz` | 14 MB | Optuna searches, splits, metrics, generation sweeps | sections 3b–3c |
 | `06_notebooks.tar.gz` | 2.4 MB | STRIPES/ECFP correlation notebook | — |
-| `02_pretraining.tar.gz` | 148 KB | pretraining loss curves and metadata | §3a |
+| `02_pretraining.tar.gz` | 148 KB | pretraining loss curves and metadata | section 3a |
 
 `MANIFEST.md` and `SHA256SUMS` sit beside the archives, so the record can be read and checked without downloading anything.
 
